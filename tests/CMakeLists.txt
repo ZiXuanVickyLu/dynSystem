@@ -1,7 +1,1 @@
-if("${PERIDYNO_GPU_BACKEND}" STREQUAL "CUDA")
-    add_subdirectory(Cuda)
-endif()
-
-if("${PERIDYNO_GPU_BACKEND}" STREQUAL "Vulkan")
-    add_subdirectory(Vulkan) 
-endif()
+ add_subdirectory(Vulkan) 

@@ -1,87 +1,52 @@
-﻿cmake_minimum_required(VERSION 3.10)                                                            #指定CMake的最低版本为3.10。若版本过低，请自行升级CMake
+﻿cmake_minimum_required(VERSION 3.10)                                                          
 
 include(cmake/modules.cmake)
 
-set(PERIDYNO_GPU_BACKEND "CUDA" CACHE STRING "GPU Backend")
-set_property(CACHE PERIDYNO_GPU_BACKEND PROPERTY STRINGS "CUDA;Vulkan;NoGPU")
+set(PERIDYNO_GPU_BACKEND "Vulkan" CACHE STRING "GPU Backend")
+set_property(CACHE PERIDYNO_GPU_BACKEND PROPERTY STRINGS "Vulkan")
 
 set(SUPPORTED_LANGUAGES "CXX;C")
 set(GPU_BACKEND "NO_BACKEND")
-if("${PERIDYNO_GPU_BACKEND}" STREQUAL "CUDA")
-    set(SUPPORTED_LANGUAGES "CUDA;CXX;C")
-endif()                                                           #指定本项目的编译语言为C++、CUDA
 
-if("${PERIDYNO_GPU_BACKEND}" STREQUAL "CUDA")
-	set(GPU_BACKEND "CUDA_BACKEND")
-elseif("${PERIDYNO_GPU_BACKEND}" STREQUAL "Vulkan")
+if("${PERIDYNO_GPU_BACKEND}" STREQUAL "Vulkan")
 	set(GPU_BACKEND "VK_BACKEND")
 else()
 	set(GPU_BACKEND "NO_BACKEND")
 endif()
 
-if("${PERIDYNO_GPU_BACKEND}" STREQUAL "CUDA")
-	project(peridyno LANGUAGES ${SUPPORTED_LANGUAGES})  
 
-    find_package(CUDA REQUIRED)
-    if(CUDA_FOUND)
-        include_directories(${CUDA_INCLUDE_DIRS})
-        link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
-        link_libraries(${CUDA_LIBRARIES})
-    else()
-        message("Cuda not found")
-    endif()      
+project(peridyno LANGUAGES ${SUPPORTED_LANGUAGES})
 
-	# define library version (update: apparently you can also do it in project()!)
-	set(PERIDYNO_LIBRARY_VERSION_MAJOR 0 CACHE STRING "peridyno major version" FORCE)
-	set(PERIDYNO_LIBRARY_VERSION_MINOR 8 CACHE STRING "peridyno minor version" FORCE)
-	set(PERIDYNO_LIBRARY_VERSION_PATCH 1 CACHE STRING "patch version of peridyno" FORCE)
-	set(PERIDYNO_LIBRARY_VERSION "${PERIDYNO_LIBRARY_VERSION_MAJOR}.${PERIDYNO_LIBRARY_VERSION_MINOR}.${PERIDYNO_LIBRARY_VERSION_PATCH}" CACHE STRING "Peridyno version" FORCE)
+include_directories(external)
+include_directories(external/glm-0.9.9.7)
+include_directories(external/gli)
+include_directories(external/imgui)
+include_directories(external/tinygltf)
+include_directories(external/ktx/include)
+include_directories(external/ktx/other_include)
+include_directories(Source/base)
 
-	set_property(GLOBAL PROPERTY USE_FOLDERS ON)                                                    #为sln内部projects设置管理folder
-	set(CMAKE_CXX_STANDARD 11 CACHE STRING "CXX STANDARD VERSION 11,14,17")                         #默认为本项目下各编译目标指定C++11语言特性
-	#set(CMAKE_C_CREATE_STATIC_LIBRARY "")
-	#set(CMAKE_C_COMPILE_OBJECT  "")
+# define library version (update: apparently you can also do it in project()!)
+set(PHOENIX_PHYSICS_VERSION_MAJOR 0 CACHE STRING "px major version" FORCE)
+set(PHOENIX_PHYSICS_VERSION_MINOR 0 CACHE STRING "px minor version" FORCE)
+set(PHOENIX_PHYSICS_VERSION_PATCH 1 CACHE STRING "patch version of px" FORCE)
+set(PHOENIX_PHYSICS_VERSION "${PHOENIX_PHYSICS_VERSION_MAJOR}.${PHOENIX_PHYSICS_VERSION_MINOR}.${PHOENIX_PHYSICS_VERSION_PATCH}" CACHE STRING "px version" FORCE)
 
-	set(CMAKE_POSITION_INDEPENDENT_CODE ON)                                                         #默认为本项目下各编译目标开启fPIC模式，cuda下面会开启rdc模式
-	set(CMAKE_CUDA_SEPARABLE_COMPILATION ON CACHE BOOL "DEFAULT SET SEPERABLE COMPILATION MODE")    #默认为本项目下各编译目标指定cuda分离编译模式
-	set(CUDA_ARCH_FLAGS 60 CACHE STRING "cuda architectures" FORCE)                                 #默认为所有cuda代码生成computability7.0下二进制代码
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set(CMAKE_CXX_STANDARD 11 CACHE STRING "CXX STANDARD VERSION 11,14,17")
 
-	set(PERIDYNO_ASSET_PATH "${CMAKE_SOURCE_DIR}/data" CACHE PATH "" FORCE)
-	set(PERIDYNO_PLUGIN_PATH "${CMAKE_BINARY_DIR}/plugin"  CACHE PATH "" FORCE)
-	#file(COPY "data/" DESTINATION "data")
+set(CMAKE_POSITION_INDEPENDENT_CODE ON) 
+
+file(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}/data" DST_DATA_DIR)
+file(TO_NATIVE_PATH "${PROJECT_SOURCE_DIR}/data" SRC_DATA_DIR)
+if (WIN32)
+	execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory ${DST_DATA_DIR})
+	execute_process(COMMAND cmd /C mklink /J ${DST_DATA_DIR} ${SRC_DATA_DIR})
 else()
-	project(peridyno LANGUAGES ${SUPPORTED_LANGUAGES})
-
-	include_directories(external)
-	include_directories(external/glm-0.9.9.7)
-	include_directories(external/gli)
-	include_directories(external/imgui)
-	include_directories(external/tinygltf)
-	include_directories(external/ktx/include)
-	include_directories(external/ktx/other_include)
-	include_directories(Source/base)
-
-	# define library version (update: apparently you can also do it in project()!)
-	set(PHOENIX_PHYSICS_VERSION_MAJOR 0 CACHE STRING "px major version" FORCE)
-	set(PHOENIX_PHYSICS_VERSION_MINOR 0 CACHE STRING "px minor version" FORCE)
-	set(PHOENIX_PHYSICS_VERSION_PATCH 1 CACHE STRING "patch version of px" FORCE)
-	set(PHOENIX_PHYSICS_VERSION "${PHOENIX_PHYSICS_VERSION_MAJOR}.${PHOENIX_PHYSICS_VERSION_MINOR}.${PHOENIX_PHYSICS_VERSION_PATCH}" CACHE STRING "px version" FORCE)
-
-	set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-	set(CMAKE_CXX_STANDARD 11 CACHE STRING "CXX STANDARD VERSION 11,14,17")
-
-	set(CMAKE_POSITION_INDEPENDENT_CODE ON) 
-
-	file(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}/data" DST_DATA_DIR)
-	file(TO_NATIVE_PATH "${PROJECT_SOURCE_DIR}/data" SRC_DATA_DIR)
-	if (WIN32)
-		execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory ${DST_DATA_DIR})
-		execute_process(COMMAND cmd /C mklink /J ${DST_DATA_DIR} ${SRC_DATA_DIR})
-	else()
-		execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory ${DST_DATA_DIR})
-		execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SRC_DATA_DIR} ${DST_DATA_DIR})
-	endif()
+	execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory ${DST_DATA_DIR})
+	execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SRC_DATA_DIR} ${DST_DATA_DIR})
 endif()
+
 
 
 #set output directories
@@ -124,64 +89,13 @@ else()
     message(FATAL_ERROR "Could not set install folders for this platform!")
 endif()
 
-if("${PERIDYNO_GPU_BACKEND}" STREQUAL "CUDA")
-	option(PERIDYNO_LIBRARY_FRAMEWORK "Enable binding the framework library" ON)
-	option(PERIDYNO_LIBRARY_IO "Enable binding the io library" ON)
-	option(PERIDYNO_LIBRARY_RENDERING "Enable binding the rendering library" ON)
-	option(PERIDYNO_LIBRARY_PLUGIN "Enable binding the plugin libraries" OFF)
-	option(PERIDYNO_PYTHON_BINDING "Enable python binding with pybind11" OFF)
-	if(PERIDYNO_PYTHON_BINDING)
-	    add_subdirectory(python)
-	endif()
-
-	option(PERIDYNO_TESTS "Enable python binding with pybind11" OFF)
-	if(PERIDYNO_TESTS)
-	    add_subdirectory(external/gtest)
-	    add_subdirectory(tests)
-	endif()
-
-	add_subdirectory(external/glfw-3.3.0)
-	add_subdirectory(external/glad-4.6)
-	add_subdirectory(external/imgui)
-
-	if(PERIDYNO_LIBRARY_PLUGIN)
-		option(PERIDYNO_LIBRARY_ALEMBIC "Enable binding the abc exporter library" ON)
-		option(PERIDYNO_LIBRARY_GMSH "Enable binding the Gmsh library" OFF)
-		option(PERIDYNO_LIBRARY_FBX "Enable binding the FBX library" OFF)
-		
-		if(PERIDYNO_LIBRARY_ALEMBIC)
-			add_subdirectory(external/Imath)
-			add_subdirectory(external/alembic/)
-		endif()
-
-		if(PERIDYNO_LIBRARY_GMSH)
-			add_subdirectory(external/gmsh-fork)
-		endif()
-	endif()
-
-	# VTK rendering support, off by default
-	option(PERIDYNO_PLUGIN_VTK "Enable VTK plugin for visualization" OFF)
-	# Qt GUI support, off by default
-	option(PERIDYNO_Qt5_GUI "Enable building Qt-based applications" OFF)
-
-	if(PERIDYNO_Qt5_GUI)
-	    add_subdirectory(external/nodeeditor)
-	endif()
-
-
-	option(PERIDYNO_EXAMPLE "Enable building examples" ON)
-	if(PERIDYNO_EXAMPLE)
-	    add_subdirectory(examples)
-	endif()
-
-elseif("${PERIDYNO_GPU_BACKEND}" STREQUAL "Vulkan")
+if("${PERIDYNO_GPU_BACKEND}" STREQUAL "Vulkan")
 
 	set(PERIDYNO_ASSET_PATH "${CMAKE_SOURCE_DIR}/data" CACHE PATH "" FORCE)
 	option(PERIDYNO_LIBRARY_FRAMEWORK "Enable binding the framework library" ON)
 	option(PERIDYNO_LIBRARY_IO "Enable binding the io library" ON)
 	option(PERIDYNO_LIBRARY_RENDERING "Enable binding the rendering library" ON)
 	option(PERIDYNO_LIBRARY_PLUGIN "Enable binding the plugin libraries" OFF)
-	option(PERIDYNO_PYTHON_BINDING "Enable python binding with pybind11" OFF)
 	
 	add_subdirectory(external/glfw-3.3.0)
 	add_subdirectory(external/glad-4.6)
@@ -313,10 +227,6 @@ elseif("${PERIDYNO_GPU_BACKEND}" STREQUAL "Vulkan")
 	    add_subdirectory(Tests)
 	endif()
 
-	if(PERIDYNO_Qt5_GUI)
-		add_subdirectory(external/nodeeditor)
-	endif()
-
 	option(PHOENIX_Examples "Enable building examples" ON)
 	if(PHOENIX_Examples)
 	    add_subdirectory(examples)
@@ -326,11 +236,7 @@ else()
 	option(PERIDYNO_LIBRARY_IO "Enable binding the io library" ON)
 	option(PERIDYNO_LIBRARY_RENDERING "Enable binding the rendering library" ON)
 	option(PERIDYNO_LIBRARY_PLUGIN "Enable binding the plugin libraries" OFF)
-	option(PERIDYNO_PYTHON_BINDING "Enable python binding with pybind11" OFF)
-	if(PERIDYNO_PYTHON_BINDING)
-		add_subdirectory(python)
-	endif()
-
+	
 	option(PERIDYNO_TESTS "Enable python binding with pybind11" OFF)
 	if(PERIDYNO_TESTS)
 		add_subdirectory(external/gtest)
@@ -340,13 +246,6 @@ else()
 	add_subdirectory(external/glfw-3.3.0)
 	add_subdirectory(external/glad-4.6)
 	add_subdirectory(external/imgui)
-
-	# Qt GUI support, off by default
-	option(PERIDYNO_Qt5_GUI "Enable building Qt-based applications" OFF)
-
-	if(PERIDYNO_Qt5_GUI)
-		add_subdirectory(external/nodeeditor)
-	endif()
 
 	option(PERIDYNO_EXAMPLE "Enable building examples" ON)
 	if(PERIDYNO_EXAMPLE)

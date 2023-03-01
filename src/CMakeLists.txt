@@ -29,11 +29,6 @@ endif()
 add_subdirectory(Dynamics)
 add_subdirectory(Topology)
 
-if("${PERIDYNO_GPU_BACKEND}" STREQUAL "CUDA")
-    add_subdirectory(Interaction)
-    add_subdirectory(Modeling)
-endif()
-
 # Write/install version file
 include(CMakePackageConfigHelpers)
 set(version_file "${CMAKE_CURRENT_BINARY_DIR}/cmake/PeridynoConfigVersion.cmake")
