@@ -1,0 +1,5 @@
+if("${PERIDYNO_GPU_BACKEND}" STREQUAL "CUDA")
+    add_subdirectory(Cuda)
+else()
+    add_subdirectory(Vulkan) 
+endif()
