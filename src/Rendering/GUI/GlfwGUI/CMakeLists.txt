@@ -53,13 +53,8 @@ target_include_directories(${LIB_NAME} PUBLIC
     $<INSTALL_INTERFACE:${PERIDYNO_INC_INSTALL_DIR}>
     $<INSTALL_INTERFACE:${PERIDYNO_INC_INSTALL_DIR}/Rendering/GUI>)
 
-#TODO: include a general IO library
-if("${PERIDYNO_GPU_BACKEND}" STREQUAL "CUDA")
-    target_link_libraries(${LIB_NAME} Core Framework IO RenderCore GLRenderEngine ImWidgets glfw imgui)
-else()
-    target_link_libraries(${LIB_NAME} Core Framework RenderCore GLRenderEngine ImWidgets glfw imgui)
-endif()
 
+target_link_libraries(${LIB_NAME} Core Framework RenderCore GLRenderEngine ImWidgets glfw imgui)
 
 install(TARGETS ${LIB_NAME}
     EXPORT ${LIB_NAME}Targets

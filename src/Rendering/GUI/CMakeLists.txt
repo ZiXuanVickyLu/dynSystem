@@ -8,7 +8,3 @@ endif()
 
 add_subdirectory(GlfwGUI)
 add_subdirectory(ImWidgets)
-
-    if(PERIDYNO_Qt5_GUI)
-	    add_subdirectory(QtGUI)
-	endif()
