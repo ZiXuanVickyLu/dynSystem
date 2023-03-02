@@ -27,6 +27,12 @@ include_directories(external/ktx/other_include)
 include_directories(Source/base)
 
 # define library version (update: apparently you can also do it in project()!)
+set(PERIDYNO_LIBRARY_VERSION_MAJOR 0 CACHE STRING "peridyno major version" FORCE)
+set(PERIDYNO_LIBRARY_VERSION_MINOR 8 CACHE STRING "peridyno minor version" FORCE)
+set(PERIDYNO_LIBRARY_VERSION_PATCH 1 CACHE STRING "patch version of peridyno" FORCE)
+set(PERIDYNO_LIBRARY_VERSION "${PERIDYNO_LIBRARY_VERSION_MAJOR}.${PERIDYNO_LIBRARY_VERSION_MINOR}.${PERIDYNO_LIBRARY_VERSION_PATCH}" CACHE STRING "Peridyno version" FORCE)
+
+# define library version (update: apparently you can also do it in project()!)
 set(PHOENIX_PHYSICS_VERSION_MAJOR 0 CACHE STRING "px major version" FORCE)
 set(PHOENIX_PHYSICS_VERSION_MINOR 0 CACHE STRING "px minor version" FORCE)
 set(PHOENIX_PHYSICS_VERSION_PATCH 1 CACHE STRING "patch version of px" FORCE)
@@ -221,11 +227,6 @@ if("${PERIDYNO_GPU_BACKEND}" STREQUAL "Vulkan")
 		
 	endif()
 
-	option(PHOENIX_Tests "Enable building px tests" ON)
-	if(PHOENIX_Tests)
-	    add_subdirectory(external/gtest)
-	    add_subdirectory(Tests)
-	endif()
 
 	option(PHOENIX_Examples "Enable building examples" ON)
 	if(PHOENIX_Examples)
@@ -237,10 +238,8 @@ else()
 	option(PERIDYNO_LIBRARY_RENDERING "Enable binding the rendering library" ON)
 	option(PERIDYNO_LIBRARY_PLUGIN "Enable binding the plugin libraries" OFF)
 	
-	option(PERIDYNO_TESTS "Enable python binding with pybind11" OFF)
 	if(PERIDYNO_TESTS)
 		add_subdirectory(external/gtest)
-		add_subdirectory(tests)
 	endif()
 
 	add_subdirectory(external/glfw-3.3.0)
@@ -252,7 +251,6 @@ else()
 		add_subdirectory(examples)
 	endif()
 endif()
-
 add_subdirectory(src)
 
 

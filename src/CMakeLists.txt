@@ -26,12 +26,14 @@ if(PERIDYNO_LIBRARY_PLUGIN)
     add_subdirectory(Plugin)
 endif()
 
-add_subdirectory(Dynamics)
 add_subdirectory(Topology)
+
+add_subdirectory(Dynamics)
 
 # Write/install version file
 include(CMakePackageConfigHelpers)
 set(version_file "${CMAKE_CURRENT_BINARY_DIR}/cmake/PeridynoConfigVersion.cmake")
+message("${PERIDYNO_LIBRARY_VERSION}")
 write_basic_package_version_file(${version_file}
     VERSION ${PERIDYNO_LIBRARY_VERSION}
     COMPATIBILITY AnyNewerVersion)
