@@ -48,7 +48,7 @@ namespace dyno
 
 		DEF_ARRAY_IN(Vec3f, Position, DeviceType::GPU, "");
 		
-		DArray<Vector<uint,3>> m_triangles;
+		DArray<uint> m_triangles;
 
 	protected:
 		virtual void paintGL(GLRenderPass mode) override;

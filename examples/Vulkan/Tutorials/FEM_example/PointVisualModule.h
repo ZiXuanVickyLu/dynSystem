@@ -49,7 +49,7 @@ namespace dyno
 
 		DEF_ARRAY_IN(Vec3f, Position, DeviceType::GPU, "");
 
-		DEF_VAR(float, PointSize, 0.04f, "Size of rendered particles");
+		DEF_VAR(float, PointSize, 0.02f, "Size of rendered particles");
 
 	protected:
 		virtual void paintGL(GLRenderPass pass) override;

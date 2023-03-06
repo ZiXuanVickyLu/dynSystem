@@ -21,7 +21,10 @@ int main(int, char**)
 
 	elastic->loadTetGenFile(getAssetPath() + "smesh/cube.1", Vec3f(0, 1, 0));
 
-
+	auto sRender = std::make_shared<SurfaceVisualModule>();
+	elastic->statePosition()->connect(sRender->inPosition());
+	sRender->m_triangles.assign(elastic->mIndex);
+	elastic->graphicsPipeline()->pushModule(sRender);
 
 	auto ptRender = std::make_shared<PointVisualModule>();
 	elastic->statePosition()->connect(ptRender->inPosition());

@@ -39,7 +39,9 @@ void main()
     newVel[index] = newVel[index] + (g + force[index]) * pushConsts.dt;
     newPos[index] = newPos[index] + newVel[index] * pushConsts.dt;
     if(newPos[index][1] <= 0.0){
-    if(newVel[index][1] <=0.0) newVel[index][1] *= -0.1;
+    if(newVel[index][1] <=0.0) newVel[index][1] *= -0.01;
     newPos[index][1] = 0.0;
     }
+
+    newVel[index] *= 0.999;
 }

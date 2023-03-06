@@ -92,6 +92,25 @@ namespace dyno
 		this->tetSet.m_Triangles.assign(meshLoader.m_triangles);
 		this->tetSet.m_Tetrahedrons.assign(meshLoader.m_tets);
 		
+		std::vector<Triangle> triSet(this->tetSet.m_Triangles.size());
+		std::vector<uint32_t> triIndex;
+
+		vkTransfer(triSet, *tetSet.m_Triangles.handle());
+		for (size_t i = 0; i < triSet.size(); i++)
+		{
+			uint32_t v0 = triSet[i][0];
+			uint32_t v1 = triSet[i][1];
+			uint32_t v2 = triSet[i][2];
+
+			triIndex.push_back(v2);
+			triIndex.push_back(v1);
+			triIndex.push_back(v0);
+		}
+
+		mIndex.resize(triIndex.size());
+		mIndex.assign(triIndex);
+		triIndex.clear();
+
 	}
 
 }

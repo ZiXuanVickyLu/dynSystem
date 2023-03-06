@@ -52,6 +52,7 @@ namespace dyno
 		DEF_ARRAY_STATE(Coord, Color, DeviceType::GPU, "Color Map for Debug");
 	
 		TetrahedronSet tetSet;
+		DArray<uint> mIndex;
 
 	};
 }

@@ -65,7 +65,6 @@ namespace dyno
 		
 		auto& xyz = this->inPosition()->getData();
 		mNumPoints = xyz.size() * 3;
-		printf("%d\n", mNumPoints);
 		mVertexBuffer->load(xyz.buffer(), xyz.bufferSize());
 
 
