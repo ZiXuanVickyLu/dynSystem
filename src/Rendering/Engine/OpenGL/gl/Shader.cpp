@@ -148,7 +148,7 @@ namespace gl {
 				glNamedStringARB(GL_SHADER_INCLUDE_ARB, key.length(), key.c_str(), src.length(), src.c_str());
 			}
 		}
-
+		printf("[ShaderFactory] Loading init shaders...\n");
 		initialized = true;
 		return initialized;
 	}

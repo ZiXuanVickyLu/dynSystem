@@ -71,3 +71,5 @@ macro(build_library LIB_NAME LIB_DEPENDENCY)
 endmacro()
      
 #set no lib for now
+    set(LIB_DEPENDENCY Core Framework Topology)
+    build_library(FEM LIB_DEPENDENCY)
