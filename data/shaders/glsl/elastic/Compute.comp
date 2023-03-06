@@ -1,0 +1,66 @@
+#version 450
+#extension GL_GOOGLE_include_directive : enable
+#extension GL_EXT_debug_printf : enable
+
+layout(std430, binding = 0) buffer NewPosOut {
+	vec3 Pos[ ];
+};
+
+layout(std430, binding = 1) buffer Tetrahedron {
+	uvec4 tet[ ];
+};
+
+layout(std430, binding = 2) buffer B_inverse {
+	mat3 B[ ];
+};
+
+layout(std430, binding = 3) buffer DeformationGradient {
+	mat3 F[ ];
+};
+
+layout(std430, binding = 4) buffer PKStress {
+	mat3 P[ ];
+};
+
+layout(std430, binding = 5) buffer m_J {
+    float J[ ];
+};
+
+layout (std140, binding = 6) uniform MuBuf{
+    float mu;
+}mu_;
+
+layout (std140, binding = 7) uniform LambdaBuf{
+    float lambda;
+}lambda_;
+
+layout (push_constant) uniform PushConsts {
+    float lambda;
+    float mu;
+    uint elementCount;
+} pushConsts;
+
+layout (local_size_x = 64) in;
+
+
+void main() 
+{
+    uvec3 id = gl_GlobalInvocationID; 
+
+	uint index = id.x;
+	if (index >= pushConsts.elementCount) 
+		return;
+    mat3 D;
+    vec3 start = Pos[tet[index][0]];
+
+    D[0] = Pos[tet[index][1]] - start;
+    D[1] = Pos[tet[index][2]] - start;
+    D[2] = Pos[tet[index][3]] - start;
+
+    F[index] = D * B[index];
+    J[index] = determinant(F[index]);
+    mat3 F_1 = inverse(F[index]);
+    J[index] = J[index] > 1e-7 ? J[index] : 1e-7; 
+    P[index] = pushConsts.mu* (F[index] - transpose(F_1)) + pushConsts.lambda * log(J[index]) * transpose(F_1);
+
+}

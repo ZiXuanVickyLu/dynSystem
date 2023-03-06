@@ -1,0 +1,44 @@
+#version 450
+#extension GL_GOOGLE_include_directive : enable
+#extension GL_EXT_debug_printf : enable
+
+
+layout(std430, binding = 0) buffer PK1 {
+	mat3 P[ ];
+};
+
+layout(std430, binding = 1) buffer forceOut {
+	mat3 eleForce[ ];
+};
+
+layout(std430, binding = 2) buffer Tetrahedron {
+	uvec4 tet[ ];
+};
+
+layout(std430, binding = 3) buffer Volume {
+    float volume[ ];
+};
+
+layout(std430, binding = 4) buffer B_inverse {
+    mat3 B[ ];
+};
+
+layout (push_constant) uniform PushConsts {
+    uint elementCount;
+} pushConsts;
+
+layout (local_size_x = 64) in;
+
+
+void main() 
+{
+    uvec3 id = gl_GlobalInvocationID; 
+
+	uint index = id.x;
+	if (index >= pushConsts.elementCount) 
+		return;
+
+     mat3 H = -volume[index] * (P[index] * transpose(B[index]));
+     eleForce[index] = H;
+   
+}

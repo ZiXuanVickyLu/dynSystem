@@ -1,0 +1,45 @@
+#version 450
+#extension GL_GOOGLE_include_directive : enable
+#extension GL_EXT_debug_printf : enable
+
+layout(std430, binding = 0) buffer NewPosOut {
+	vec3 newPos[ ];
+};
+
+layout(std430, binding = 1) buffer NewVelOut {
+	vec3 newVel[ ];
+};
+
+layout(std430, binding = 2) buffer ForceIn {
+	vec3 force[ ];
+};
+
+layout (binding = 0) uniform  dtBuf{
+    float dt_;
+}dt;
+
+layout (push_constant) uniform PushConsts {
+    float dt;
+    uint vertexCount;
+} pushConsts;
+
+layout (local_size_x = 64) in;
+
+
+void main() 
+{
+    uvec3 id = gl_GlobalInvocationID; 
+
+	uint index = id.x;
+	if (index >= pushConsts.vertexCount) 
+		return;
+
+    vec3 g = vec3(0.0,-9.8,0.0);   
+    
+    newVel[index] = newVel[index] + (g + force[index]) * pushConsts.dt;
+    newPos[index] = newPos[index] + newVel[index] * pushConsts.dt;
+    if(newPos[index][1] <= 0.0){
+    if(newVel[index][1] <=0.0) newVel[index][1] *= -0.1;
+    newPos[index][1] = 0.0;
+    }
+}
